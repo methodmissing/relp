@@ -40,7 +40,7 @@ lib = libs_path + "librelp.#{LIBEXT}"
 Dir.chdir librelp_path do
   # Replace select() with rb_thread_select() in virgin source
   sys "sed -ie \"s/select(/rb_thread_select(/g\" src/relpsess.c src/relp.c", "librelp rb_thread_select patch error!"
-  sys "./configure --prefix=#{dst_path} --disable-shared --enable-static --with-pic && make && make install", "librelp compile error!"
+  sys "./configure --prefix=#{dst_path} --disable-shared --enable-static --enable-debug --with-pic && make && make install", "librelp compile error!"
 end unless File.exist?(lib)
 
 dir_config('relp')
