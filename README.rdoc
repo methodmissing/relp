@@ -1,0 +1,7 @@
+== TODO
+
+* Fix Rubinius and JRuby compile
+* rb_thread_blocking_region on connect, bind, send + explicit engine destroy
+* engine destruct on handler error or error handler callback API ?
+* docs
+* examples
