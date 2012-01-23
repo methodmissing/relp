@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>module Relp - Ruby wrapper for librelp, an easy to use library for the RELP (Reliable Event Logging Protocol) protocol.</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body id="top" class="module">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>lib/relp/version.rb
+    <li>lib/relp.rb
+    <li>ext/relp/relp_ext.c
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-c-error">::error</a>
+    
+    <li><a href="#method-c-version">::version</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="./README_rdoc.html">README</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./Relp.html">Relp</a>
+  
+    <li><a href="./Relp/Client.html">Relp::Client</a>
+  
+    <li><a href="./Relp/Error.html">Relp::Error</a>
+  
+    <li><a href="./Relp/Server.html">Relp::Server</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="module">module Relp</h1>
+
+  <div id="description" class="description">
+    
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+    <!-- Constants -->
+    <section id="constants-list" class="section">
+      <h3 class="section-header">Constants</h3>
+      <dl>
+      
+        <dt id="ACCEPT_ERR">ACCEPT_ERR
+        
+        <dd class="description">
+        
+      
+        <dt id="ADDR_UNKNOWN">ADDR_UNKNOWN
+        
+        <dd class="description">
+        
+      
+        <dt id="CMD_DISABLED">CMD_DISABLED
+        
+        <dd class="description">
+        
+      
+        <dt id="COULD_NOT_BIND">COULD_NOT_BIND
+        
+        <dd class="description">
+        
+      
+        <dt id="DATA_TOO_LONG">DATA_TOO_LONG
+        
+        <dd class="description">
+        
+      
+        <dt id="END_OF_DATA">END_OF_DATA
+        
+        <dd class="description">
+        
+      
+        <dt id="ERRORS">ERRORS
+        
+        <dd class="description"><p>Map numeric librelp return codes to end user friendly strings</p>
+        
+      
+        <dt id="INCOMPAT_OFFERS">INCOMPAT_OFFERS
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_CMD">INVALID_CMD
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_DATALEN">INVALID_DATALEN
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_FRAME">INVALID_FRAME
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_HDL">INVALID_HDL
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_HNAME">INVALID_HNAME
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_OFFER">INVALID_OFFER
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_PARAM">INVALID_PARAM
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_PORT">INVALID_PORT
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_RSPHDR">INVALID_RSPHDR
+        
+        <dd class="description">
+        
+      
+        <dt id="INVALID_TXNR">INVALID_TXNR
+        
+        <dd class="description">
+        
+      
+        <dt id="IO_ERR">IO_ERR
+        
+        <dd class="description">
+        
+      
+        <dt id="MALICIOUS_HNAME">MALICIOUS_HNAME
+        
+        <dd class="description">
+        
+      
+        <dt id="NOT_FOUND">NOT_FOUND
+        
+        <dd class="description">
+        
+      
+        <dt id="NOT_IMPLEMENTED">NOT_IMPLEMENTED
+        
+        <dd class="description">
+        
+      
+        <dt id="OK">OK
+        
+        <dd class="description">
+        
+      
+        <dt id="OUT_OF_MEMORY">OUT_OF_MEMORY
+        
+        <dd class="description">
+        
+      
+        <dt id="PARAM_ERROR">PARAM_ERROR
+        
+        <dd class="description">
+        
+      
+        <dt id="PARTIAL_WRITE">PARTIAL_WRITE
+        
+        <dd class="description">
+        
+      
+        <dt id="RQD_FEAT_MISSING">RQD_FEAT_MISSING
+        
+        <dd class="description">
+        
+      
+        <dt id="RSP_STATE_ERR">RSP_STATE_ERR
+        
+        <dd class="description">
+        
+      
+        <dt id="SESSION_BROKEN">SESSION_BROKEN
+        
+        <dd class="description">
+        
+      
+        <dt id="SESSION_CLOSED">SESSION_CLOSED
+        
+        <dd class="description">
+        
+      
+        <dt id="TIMED_OUT">TIMED_OUT
+        
+        <dd class="description">
+        
+      
+        <dt id="UNKNOWN_CMD">UNKNOWN_CMD
+        
+        <dd class="description">
+        
+      
+        <dt id="VERSION">VERSION
+        
+        <dd class="description">
+        
+      
+      </dl>
+    </section>
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-error" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">error</span><span
+            class="method-args">(code)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="error-source">
+            <pre><span class="ruby-comment"># File lib/relp.rb, line 86</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">error</span>(<span class="ruby-identifier">code</span>)
+  <span class="ruby-constant">ERRORS</span>[<span class="ruby-identifier">code</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- error-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- error-method -->
+
+    
+      <div id="method-c-version" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            version    &rarr;  String
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <pre>Returns the librelp version linked against.</pre>
+
+<h3 id="method-c-version-label-Examples">Examples</h3>
+
+<pre class="ruby"><span class="ruby-constant">Relp</span>.<span class="ruby-identifier">version</span>    =<span class="ruby-operator">&gt;</span>  <span class="ruby-string">'1.0.0'</span>
+</pre>
+          
+
+          
+          <div class="method-source-code" id="version-source">
+            <pre>static VALUE rb_relp_m_version(RELP_UNUSED VALUE obj)
+{
+    return rb_str_new2(relpEngineGetVersion());
+}</pre>
+          </div><!-- version-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- version-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+
