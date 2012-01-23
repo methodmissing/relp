@@ -12,11 +12,11 @@ Caveats :
 
 * Minor message duplication may occur if a network connection between the RELP client and RELP server breaks after the client could successfully send some messages but the server could not acknowledge them. Very very slim chance, but possible.
 
-It was initially designed for rsyslog-to-rsyslog communication, but can be used for various other applications. You can reference the protocol specification [here](http://www.librelp.com/relp.html)
+It was initially designed for rsyslog-to-rsyslog communication, but can be used for various other applications. You can reference the protocol specification {here}[http://www.librelp.com/relp.html]
 
 == About librelp
 
-Quote from the librelp [homepage](http://www.librelp.com/) :
+Quote from the librelp {homepage}[http://www.librelp.com/] :
 
 "librelp is an easy to use library for the RELP protocol. RELP in turn provides reliable event logging over the network (and consequently RELP stands for Reliable Event Logging Protocol). RELP was initiated by Rainer Gerhards after he was finally upset by the lossy nature of plain tcp syslog and wanted a cure for all these dangling issues."
 
@@ -46,7 +46,7 @@ Here's a few basic examples. Please refer to documentation (http://methodmissing
 
 === Low level API
 
-All protocol and connection state's kept within a single context, the Relp::Engine. An engine must be instantiated and passed as an initializer argument to Relp::Client and Relp::Server instances. Each of these roles also support a destroy method which will gracefully shutdown the engine and transfer state. This pretty much resembles the [rsyslog](http://rsyslog.com) Output / Input module design and we had to jump through some hoops in order to hide these details from the end user.
+All protocol and connection state's kept within a single context, the Relp::Engine. An engine must be instantiated and passed as an initializer argument to Relp::Client and Relp::Server instances. Each of these roles also support a destroy method which will gracefully shutdown the engine and transfer state. This pretty much resembles the {rsyslog}[http://rsyslog.com] Output / Input module design and we had to jump through some hoops in order to hide these details from the end user.
 
   # client process
   engine = Relp::Engine.new
@@ -66,11 +66,11 @@ All protocol and connection state's kept within a single context, the Relp::Engi
 
 Don't know and in the interim, don't care. It's fast enough for most use cases - shipping events to an event sink in a reliable manner. There's two things to note here :
 
-* [librelp](http://www.librelp.com) uses the [select](http://en.wikipedia.org/wiki/Select_(Unix)) syscall for I/O multiplexing. This is primarily for portability but also mirrors the [rsyslog](http://rsyslog.com/) Output -> Input module and subsequent [librelp](http://www.librelp.com) design. It's thus not designed for thousands on concurrent clients on the server side, for which a platform specific epoll, kqueue etc. implementation is preferred.
+* {librelp}[http://www.librelp.com] uses the {select}[http://en.wikipedia.org/wiki/Select_(Unix)] syscall for I/O multiplexing. This is primarily for portability but also mirrors the {rsyslog}[http://rsyslog.com/] Output -> Input module and subsequent {librelp}[http://www.librelp.com] design. It's thus not designed for thousands on concurrent clients on the server side, for which a platform specific epoll, kqueue etc. implementation is preferred.
 
 * The RELP protocol uses consistent framing - there's thus additional parsing overhead for participants. This is negligible though.
 
-Use [rsyslog](http://rsyslog.com/) with the [RELP Input Module](http://rsyslog.com/doc/imrelp.html) as an event sink if you must.
+Use {rsyslog}[http://rsyslog.com/] with the {RELP Input Module}[http://rsyslog.com/doc/imrelp.html] as an event sink if you must.
 
 == Resources
 
