@@ -1,5 +1,46 @@
+/*
+ *
+ * Author:: Lourens Naudé
+ * Homepage::  http://github.com/methodmissing/relp
+ * Date:: 20120123
+ *
+ *----------------------------------------------------------------------------
+ *
+ * Copyright (C) 2012 by Lourens Naudé. All Rights Reserved.
+ * Email: lourens at methodmissing dot com
+ *
+ * (The MIT License)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * 'Software'), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *---------------------------------------------------------------------------
+ *
+ */
+
 #include <relp_ext.h>
 
+/*
+ * :nodoc:
+ *  Flags a client as "cleaned up by librelp"
+ *
+*/
 static VALUE rb_relp_engine_flag_client(VALUE obj, void *args)
 {
     if (obj && !NIL_P(obj)){
@@ -9,12 +50,22 @@ static VALUE rb_relp_engine_flag_client(VALUE obj, void *args)
     return Qnil;
 }
 
+/*
+ * :nodoc:
+ *  Iterator that flags any clients registered with this engine instance as "cleaned up by librelp"
+ *
+*/
 static void rb_relp_engine_flag_clients(relp_engine_wrapper *engine)
 {
     if(!NIL_P(engine->clients))
         rb_iterate(rb_each, engine->clients, (iterfunc)rb_relp_engine_flag_client, (VALUE)NULL);
 }
 
+/*
+ * :nodoc:
+ *  GC mark callback
+ *
+*/
 void rb_relp_mark_engine_gc(void *ptr)
 {
     relp_engine_wrapper *engine = (relp_engine_wrapper *)ptr;
@@ -22,6 +73,11 @@ void rb_relp_mark_engine_gc(void *ptr)
     rb_gc_mark(engine->callback);
 }
 
+/*
+ * :nodoc:
+ *  GC free callback
+ *
+*/
 void rb_relp_free_engine_gc(void *ptr)
 {
     relp_engine_wrapper *engine = (relp_engine_wrapper *)ptr;
@@ -33,6 +89,17 @@ void rb_relp_free_engine_gc(void *ptr)
     }
 }
 
+/*
+ *  call-seq:
+ *     Relp::Engine.new    =>  Relp::Engine
+ *
+ *  Returns a handle to a new Relp engine context, which is a container for all protocol and connection
+ *  state.
+ *
+ * === Examples
+ *     Relp::Engine.new    =>  Relp::Engine
+ *
+*/
 static VALUE rb_relp_engine_new(VALUE obj)
 {
     relp_engine_wrapper *engine = NULL;
@@ -51,6 +118,18 @@ static VALUE rb_relp_engine_new(VALUE obj)
     return obj;
 }
 
+/*
+ *  call-seq:
+ *     engine.run    =>  Fixnum
+ *
+ *  Starts the Relp engine - begins to read and write data from it's peers.
+ *
+ * === Examples
+ *     engine = Relp::Engine.new    =>  Relp::Engine
+ *     # blocks the current thread of execution
+ *     engine.run                   =>  Fixnum
+ *
+*/
 static VALUE rb_relp_engine_run(VALUE obj)
 {
     relpRetVal ret;
@@ -63,6 +142,21 @@ static VALUE rb_relp_engine_run(VALUE obj)
     return INT2NUM(ret);
 }
 
+/*
+ *  call-seq:
+ *     engine.destroy    =>  nil
+ *
+ *  Stops the Relp engine and terminates all operations. This is a low level API.
+ *
+ * === Examples
+ *     engine = Relp::Engine.new    =>  Relp::Engine
+ *     Thread.new do
+ *       sleep 1 && engine.destroy
+ *     end
+ *     # blocks the current thread of execution
+ *     engine.run                   =>   Fixnum
+ *
+*/
 static VALUE rb_relp_engine_destroy(VALUE obj)
 {
     relpRetVal ret;
@@ -74,6 +168,18 @@ static VALUE rb_relp_engine_destroy(VALUE obj)
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     engine.resolve = true    =>  nil
+ *
+ *  Sets hostname resolution preferences for this Relp engine instance.
+ *
+ * === Examples
+ *     engine = Relp::Engine.new    =>  Relp::Engine
+ *     engine.resolve = true  # do hostname lookups
+ *     engine.resolve = false # disable hostname lookups
+ *
+*/
 static VALUE rb_relp_engine_resolve_equals(VALUE obj, VALUE resolve)
 {
     int mode;

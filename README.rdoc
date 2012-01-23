@@ -1,7 +1,117 @@
+= relp - binding for the RELP (Reliable Event Logging Protocol) protocol
+
+(c) 2012 Lourens Naudé (methodmissing), Erkki Eilonen (erkki)
+
+  http://github.com/methodmissing/relp
+
+== About the RELP protocol
+
+The RELP protocol is a reliable (read: no message loss, but see caveats below) solution to vanilla tcp event / message transfer. It supports full-duplex communication through a command-response model. Commands and responses are bound by an increasing transaction number.
+
+Caveats :
+
+* Minor message duplication may occur if a network connection between the RELP client and RELP server breaks after the client could successfully send some messages but the server could not acknowledge them. Very very slim chance, but possible.
+
+It was initially designed for rsyslog-to-rsyslog communication, but can be used for various other applications. You can reference the protocol specification [here](http://www.librelp.com/relp.html)
+
+== About librelp
+
+Quote from the librelp [homepage](http://www.librelp.com/) :
+
+"librelp is an easy to use library for the RELP protocol. RELP in turn provides reliable event logging over the network (and consequently RELP stands for Reliable Event Logging Protocol). RELP was initiated by Rainer Gerhards after he was finally upset by the lossy nature of plain tcp syslog and wanted a cure for all these dangling issues."
+
+== About this binding
+
+* Original concept and motivation sparked from syslog per process facility limitations.
+* It's friendly to the thread scheduler - uses rb_thread_select and the MRI 1.9 and Rubinius specific rb_thread_blocking_region feature. 
+* It depends on a librelp fork @ https://github.com/methodmissing/librelp with a single change set that address issues with platform specific clock_gettime use.
+* Supports a very simple client / server model and does not assume any responsibility for message encoding etc.
+* We try to bundle librelp with this extension to remove any third party installation overhead for end users. This is work in progress and may fail on some platforms in the interim.
+* The API isn't set in stone yet - it likely will change.
+
+== Usage
+
+Here's a few basic examples. Please refer to documentation (http://methodmissing.github.com/relp/) and test cases (https://github.com/methodmissing/relp/tree/master/test) for detailed usage information.
+
+=== High level API
+
+    # client process
+    client = Relp::Client.connect(Socket::AF_INET, 'localhost', 518)
+    client.send("test message")
+
+    # server process
+    receive_callback = Proc.new{|host,ip,msg| p "got #{msg} from #{ip}" }
+    # This call blocks the current thread of execution. Messages are processed via the callback Proc
+    server = Relp::Server.bind(518, receive_callback)
+
+=== Low level API
+
+All protocol and connection state's kept within a single context, the Relp::Engine. An engine must be instantiated and passed as an initializer argument to Relp::Client and Relp::Server instances. Each of these roles also support a destroy method which will gracefully shutdown the engine and transfer state. This pretty much resembles the [rsyslog](http://rsyslog.com) Output / Input module design and we had to jump through some hoops in order to hide these details from the end user.
+
+  # client process
+  engine = Relp::Engine.new
+  client = Relp::Client.new(engine)
+  client.connect(Socket::AF_INET, 'localhost', 518)
+
+  # server process
+  engine = Relp::Engine.new
+  server = Relp::Server.new(engine)
+  server.bind(518)
+  callback = Proc.new{|host,ip,msg| p "got #{msg} from #{ip}" }
+  server.on_receive(callback)
+  # starts the engine loop - blocks current thread
+  engine.run
+
+== Performance
+
+Don't know and in the interim, don't care. It's fast enough for most use cases - shipping events to an event sink in a reliable manner. There's two things to note here :
+
+* [librelp](http://www.librelp.com) uses the [select](http://en.wikipedia.org/wiki/Select_(Unix)) syscall for I/O multiplexing. This is primarily for portability but also mirrors the [rsyslog](http://rsyslog.com/) Output -> Input module and subsequent [librelp](http://www.librelp.com) design. It's thus not designed for thousands on concurrent clients on the server side, for which a platform specific epoll, kqueue etc. implementation is preferred.
+
+* The RELP protocol uses consistent framing - there's thus additional parsing overhead for participants. This is negligible though.
+
+Use [rsyslog](http://rsyslog.com/) with the [RELP Input Module](http://rsyslog.com/doc/imrelp.html) as an event sink if you must.
+
+== Resources
+
+* RELP protocol spec - http://www.librelp.com/relp.html
+* librelp - http://www.librelp.com
+* rsyslog - http://rsyslog.com
+* rsyslog RELP Input Module - http://rsyslog.com/doc/imrelp.html
+
+== Requirements
+
+* A POSIX compliant OS, known to work well on Linux, BSD variants and Mac OS X
+* Ruby MRI 1.8, 1.9 or Rubinius (JRuby capi support forthcoming)
+* A C compiler
+
+== Installation
+
+Rubygems installation
+
+    gem install relp
+
+Building from source
+
+    git clone git@github.com:methodmissing/relp.git
+    rake
+
+Running tests
+
+    rake test
+
 == TODO
 
+* Remove the debug callback function and disable debug librelp build
+* Do not allow further method calls on lower level destroy calls on Relp::Client or Relp::Server instances
+* Sanity check on_receive cb arity + test cases for error conditions in command callbacks
 * Fix Rubinius and JRuby compile
 * rb_thread_blocking_region on connect, bind, send + explicit engine destroy
 * engine destruct on handler error or error handler callback API ?
-* docs
+* Respect that Relp::Server could bind to multiple ports
 * examples
+* publish gem
+
+== Contact, feedback and bugs
+
+This project is still work in progress. Please log bugs and suggestions at https://github.com/methodmissing/relp/issues

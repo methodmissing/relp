@@ -1,7 +1,48 @@
+/*
+ *
+ * Author:: Lourens Naudé
+ * Homepage::  http://github.com/methodmissing/relp
+ * Date:: 20120123
+ *
+ *----------------------------------------------------------------------------
+ *
+ * Copyright (C) 2012 by Lourens Naudé. All Rights Reserved.
+ * Email: lourens at methodmissing dot com
+ *
+ * (The MIT License)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * 'Software'), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *---------------------------------------------------------------------------
+ *
+ */
+
 #include <relp_ext.h>
 
 static VALUE rb_relp_intern_call;
 
+/*
+ * :nodoc:
+ *  Invoke our user callback
+ *
+*/
 static VALUE rb_relp_on_receive_callback0(VALUE *args)
 {
     rb_funcall(args[0], args[1], 3, args[2], args[3], args[4]);
@@ -10,6 +51,11 @@ static VALUE rb_relp_on_receive_callback0(VALUE *args)
 #define rb_uchar_to_str(str) \
     RelpEncode(rb_str_new2((char *)str))
 
+/*
+ * :nodoc:
+ *  Low level Relp engine command handler.
+ *
+*/
 static relpRetVal rb_relp_on_receive_callback(void *obj, unsigned char *host, unsigned char *ip, unsigned char *msg, size_t len)
 {
     int status;
@@ -36,17 +82,38 @@ static relpRetVal rb_relp_on_receive_callback(void *obj, unsigned char *host, un
     }
 }
 
+/*
+ * :nodoc:
+ *  GC mark callback
+ *
+*/
 void rb_relp_mark_server_gc(void *ptr)
 {
     relp_server_wrapper *server = (relp_server_wrapper *)ptr;
     if (ptr) rb_gc_mark(server->callback);
 }
 
+/*
+ * :nodoc:
+ *  GC free callback
+ *
+*/
 void rb_relp_free_server_gc(void *ptr)
 {
     if (ptr) xfree(ptr);
 }
 
+/*
+ *  call-seq:
+ *     Relp::Server.new(engine)    =>  Relp::Server
+ *
+ *  Allocates a new Relp::Server instance and registers low level command callbacks with the engine.
+ *
+ * === Examples
+ *     engine = Relp::Engine.new          =>  Relp::Engine
+ *     server = Relp::Server.new(engine)  =>  Relp::Server
+ *
+*/
 static VALUE rb_relp_server_s_new(VALUE klass, VALUE engine_obj)
 {
     VALUE obj;
@@ -63,12 +130,37 @@ static VALUE rb_relp_server_s_new(VALUE klass, VALUE engine_obj)
     return obj;
 }
 
+/*
+ *  call-seq:
+ *     server.destroy    =>  nil
+ *
+ *  API compat with Relp::Client and Relp::Engine - noop. This is a low level API.
+ *
+ * === Examples
+ *     engine = Relp::Engine.new          =>  Relp::Engine
+ *     server = Relp::Server.new(engine)  =>  Relp::Server
+ *     server.destroy                     =>  nil
+ *
+*/
 static VALUE rb_relp_server_destroy(VALUE obj)
 {
     RelpGetServer(obj);
     return Qnil;
 }
 
+/*
+ *  call-seq:
+ *     server.bind(518)    =>  boolean
+ *
+ *  Binds a Relp engine listner to a given port. Note that this only binds to a port and doesn't start
+ *  any message exchange yet.
+ *
+ * === Examples
+ *     engine = Relp::Engine.new          =>  Relp::Engine
+ *     server = Relp::Server.new(engine)  =>  Relp::Server
+ *     server.bind(518)                   =>  true
+ *
+*/
 static VALUE rb_relp_server_bind(VALUE obj, VALUE port)
 {
     relpRetVal ret;
@@ -81,10 +173,24 @@ static VALUE rb_relp_server_bind(VALUE obj, VALUE port)
     return Qtrue;
 }
 
+/*
+ *  call-seq:
+ *     server.on_receive Proc    =>  boolean
+ *
+ *  Registers an on_receive callback for this Relp::Server instance. Accepts a Proc with an arity of 3 for
+ *  host, ip and message arguments respectively.
+ *
+ * === Examples
+ *     engine = Relp::Engine.new          =>  Relp::Engine
+ *     server = Relp::Server.new(engine)  =>  Relp::Server
+ *     server.bind(518)                   =>  true
+ *     server.on_receive Proc.new{|host,ip,msg| p "got #{msg} from #{ip}" }  =>  true
+ *
+*/
 static VALUE rb_relp_server_on_receive(VALUE obj, VALUE callback)
 {
     RelpGetServer(obj);
-    /* XXX: validate */
+    /* XXX: validate for arity + #call contract */
     server->callback = callback;
     return Qtrue;
 }

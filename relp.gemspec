@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version = Relp::VERSION
   s.summary = "Ruby wrapper for librelp, an easy to use library for the RELP (Reliable Event Logging Protocol) protocol."
   s.description = "Ruby wrapper for librelp, an easy to use library for the RELP (Reliable Event Logging Protocol) protocol."
-  s.authors = ["Lourens Naudé"]
-  s.email = ["lourens@methodmissing.com"]
+  s.authors = ["Lourens Naudé", "Erkki Eilonen"]
+  s.email = ["lourens@methodmissing.com", "erkki@itech.ee"]
   s.homepage = "http://github.com/methodmissing/relp"
   s.date = Time.now.utc.strftime('%Y-%m-%d')
   s.platform = Gem::Platform::RUBY
