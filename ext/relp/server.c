@@ -149,6 +149,17 @@ static VALUE rb_relp_server_destroy(VALUE obj)
 }
 
 /*
+ * :nodoc:
+ *  Binds a listner to the Relp engine while the GIL is released.
+ *
+*/
+static VALUE rb_relp_nogvl_server_bind(void *ptr)
+{
+    struct nogvl_server_bind_args *args = ptr;
+    return (VALUE)relpEngineAddListner2(args->engine, args->port, args->obj);
+}
+
+/*
  *  call-seq:
  *     server.bind(518)    =>  boolean
  *
@@ -164,10 +175,14 @@ static VALUE rb_relp_server_destroy(VALUE obj)
 static VALUE rb_relp_server_bind(VALUE obj, VALUE port)
 {
     relpRetVal ret;
+    struct nogvl_server_bind_args args;
     RelpGetServer(obj);
     port = rb_obj_as_string(port);
     Check_Type(port, T_STRING);
-    ret = relpEngineAddListner2(server->engine, (unsigned char*)StringValueCStr(port), (void *)obj);
+    args.engine = server->engine;
+    args.port = (unsigned char*)StringValueCStr(port);
+    args.obj = (void *)obj;
+    ret = (relpRetVal)rb_thread_blocking_region(rb_relp_nogvl_server_bind, (void *)&args, RUBY_UBF_IO, 0);
     RelpAssert(ret);
     server->flags |= RELP_SERVER_BOUND;
     return Qtrue;

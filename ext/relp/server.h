@@ -53,6 +53,12 @@ typedef struct {
     Data_Get_Struct(obj, relp_server_wrapper, server); \
     if (!server) rb_raise(rb_eTypeError, "uninitialized RELP server!");
 
+struct nogvl_server_bind_args {
+    relpEngine_t *engine;
+    unsigned char* port;
+    void *obj;
+};
+
 void _init_rb_relp_server();
 
 #endif

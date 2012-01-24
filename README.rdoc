@@ -106,7 +106,6 @@ Running tests
 * Do not allow further method calls on lower level destroy calls on Relp::Client or Relp::Server instances
 * Sanity check on_receive cb arity + test cases for error conditions in command callbacks
 * Fix Rubinius and JRuby compile
-* rb_thread_blocking_region on connect, bind, send + explicit engine destroy
 * engine destruct on handler error or error handler callback API ?
 * Respect that Relp::Server could bind to multiple ports
 * examples

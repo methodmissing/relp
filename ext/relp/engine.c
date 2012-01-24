@@ -142,6 +142,11 @@ static VALUE rb_relp_engine_run(VALUE obj)
     return INT2NUM(ret);
 }
 
+static VALUE rb_relp_nogvl_engine_destroy(void *ptr)
+{
+    return (VALUE)relpEngineDestruct((relpEngine_t *)&ptr);
+}
+
 /*
  *  call-seq:
  *     engine.destroy    =>  nil
@@ -161,7 +166,7 @@ static VALUE rb_relp_engine_destroy(VALUE obj)
 {
     relpRetVal ret;
     RelpGetEngine(obj);
-    ret = relpEngineDestruct(&engine->engine);
+    ret = (relpRetVal)rb_thread_blocking_region(rb_relp_nogvl_engine_destroy, (void *)engine->engine, RUBY_UBF_IO, 0);
     RelpAssert(ret);
     engine->flags |= RELP_ENGINE_DESTROYED;
     rb_relp_engine_flag_clients(engine);

@@ -54,6 +54,24 @@ typedef struct {
     Data_Get_Struct(obj, relp_client_wrapper, client); \
     if (!client) rb_raise(rb_eTypeError, "uninitialized RELP client!");
 
+struct nogvl_client_destroy_args {
+    relpEngine_t *engine;
+    relpClt_t *client;
+};
+
+struct nogvl_client_connect_args {
+    relpClt_t *client;
+    int prot_family;
+    unsigned char* host;
+    unsigned char* port;
+};
+
+struct nogvl_client_send_args {
+    relpClt_t *client;
+    unsigned char* msg;
+    int len;
+};
+
 void _init_rb_relp_client();
 
 #endif

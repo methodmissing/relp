@@ -81,6 +81,17 @@ static VALUE rb_relp_client_s_new(VALUE klass, VALUE engine_obj)
 }
 
 /*
+ * :nodoc:
+ *  Destroys a client while the GIL is released.
+ *
+*/
+static VALUE rb_relp_nogvl_client_destroy(void *ptr)
+{
+    struct nogvl_client_destroy_args *args = ptr;
+    return (VALUE)relpEngineCltDestruct(args->engine, &args->client);
+}
+
+/*
  *  call-seq:
  *     client.destroy    =>  nil
  *
@@ -95,11 +106,35 @@ static VALUE rb_relp_client_s_new(VALUE klass, VALUE engine_obj)
 static VALUE rb_relp_client_destroy(VALUE obj)
 {
     relpRetVal ret;
+    struct nogvl_client_destroy_args args;
     RelpGetClient(obj);
-    ret = relpEngineCltDestruct(client->engine, &client->client);
+    args.engine = client->engine;
+    args.client = client->client;
+    ret = (relpRetVal)rb_thread_blocking_region(rb_relp_nogvl_client_destroy, (void *)&args, RUBY_UBF_IO, 0);
     RelpAssert(ret);
     client->flags |= RELP_CLIENT_DESTROYED;
     return Qnil;
+}
+
+/*
+ * :nodoc:
+ *  Reconnects to a Relp server while the GIL is released.
+ *
+*/
+static VALUE rb_relp_nogvl_client_reconnect(void *ptr)
+{
+    return (VALUE)relpCltReconnect((relpClt_t *)ptr);
+}
+
+/*
+ * :nodoc:
+ *  Connects to a Relp server while the GIL is released.
+ *
+*/
+static VALUE rb_relp_nogvl_client_connect(void *ptr)
+{
+    struct nogvl_client_connect_args *args = ptr;
+    return (VALUE)relpCltConnect(args->client, args->prot_family, args->port, args->host);
 }
 
 /*
@@ -117,16 +152,21 @@ static VALUE rb_relp_client_destroy(VALUE obj)
 static VALUE rb_relp_client_connect(VALUE obj, VALUE prot_family, VALUE host, VALUE port)
 {
     relpRetVal ret;
+    struct nogvl_client_connect_args args;
     RelpGetClient(obj);
     port = rb_obj_as_string(port);
     Check_Type(host, T_STRING);
     Check_Type(port, T_STRING);
     Check_Type(prot_family, T_FIXNUM);
     if (client->flags & RELP_CLIENT_INITIAL_CONNECT) {
-        ret = relpCltConnect(client->client, NUM2INT(prot_family), (unsigned char*)StringValueCStr(port), (unsigned char*)StringValueCStr(host));
+        args.client = client->client;
+        args.prot_family = NUM2INT(prot_family);
+        args.host = (unsigned char*)StringValueCStr(host);
+        args.port = (unsigned char*)StringValueCStr(port);
+        ret = (relpRetVal)rb_thread_blocking_region(rb_relp_nogvl_client_connect, (void *)&args, RUBY_UBF_IO, 0);
         if (ret == RELP_RET_OK) client->flags &= ~RELP_CLIENT_INITIAL_CONNECT;
     } else {
-        ret = relpCltReconnect(client->client);
+        ret = (relpRetVal)rb_thread_blocking_region(rb_relp_nogvl_client_reconnect, (void *)client->client, RUBY_UBF_IO, 0);
     }
 
     if(ret == RELP_RET_OK) {
@@ -136,6 +176,17 @@ static VALUE rb_relp_client_connect(VALUE obj, VALUE prot_family, VALUE host, VA
     }
     RelpAssert(ret);
     return Qtrue;
+}
+
+/*
+ * :nodoc:
+ *  Sends a message to a Relp server while the GIL is released.
+ *
+*/
+static VALUE rb_relp_nogvl_client_send(void *ptr)
+{
+    struct nogvl_client_send_args *args = ptr;
+    return (VALUE)relpCltSendSyslog(args->client, args->msg, args->len);
 }
 
 /*
@@ -154,9 +205,13 @@ static VALUE rb_relp_client_connect(VALUE obj, VALUE prot_family, VALUE host, VA
 static VALUE rb_relp_client_send(VALUE obj, VALUE message)
 {
     relpRetVal ret;
+    struct nogvl_client_send_args args;
     RelpGetClient(obj);
     Check_Type(message, T_STRING);
-    ret = relpCltSendSyslog(client->client, (unsigned char*)StringValueCStr(message), RSTRING_LEN(message) + 1);
+    args.client = client->client;
+    args.msg = (unsigned char*)StringValueCStr(message);
+    args.len = RSTRING_LEN(message) + 1;
+    ret = (relpRetVal)rb_thread_blocking_region(rb_relp_nogvl_client_send, (void *)&args, RUBY_UBF_IO, 0);
     RelpAssert(ret);
     return Qtrue;
 }
