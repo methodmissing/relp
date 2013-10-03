@@ -108,7 +108,7 @@ static VALUE rb_relp_engine_new(VALUE obj)
     obj = Data_Make_Struct(rb_cRelpEngine, relp_engine_wrapper, rb_relp_mark_engine_gc, rb_relp_free_engine_gc, engine);
     ret = relpEngineConstruct(&engine->engine);
     RelpAssert(ret);
-    ret = relpEngineSetDbgprint(engine->engine, printf);
+    ret = relpEngineSetDbgprint(engine->engine, NULL);
     RelpAssert(ret);
     ret = relpEngineSetEnableCmd(engine->engine, (unsigned char*)"syslog", eRelpCmdState_Required);
     RelpAssert(ret);
