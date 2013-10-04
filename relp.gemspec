@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.extensions = "ext/relp/extconf.rb"
   s.has_rdoc = true
-  s.files = `git ls-files`.split("\n")
-  s.test_files = `git ls-files test`.split("\n")
+  s.files = Dir.glob("*/**/*")
+  s.test_files = Dir.glob("test/*")
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.add_development_dependency('rake-compiler', '~> 0.8.0')
