@@ -6,6 +6,7 @@ require 'rake' unless defined?(Rake)
 # Prefer compiled Rubinius bytecode in .rbx/
 ENV["RBXOPT"] = "-Xrbc.db"
 
+require 'rubygems/package_task'
 require 'rake/extensiontask'
 require 'rake/testtask'
 begin
